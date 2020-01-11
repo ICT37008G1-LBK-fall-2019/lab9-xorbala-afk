@@ -2,8 +2,17 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <form id="user-search" action="">
+      <label for="user-id">Please enter user id (from 1 to 10):</label>
+      <input type="number" id="user-id" name="user-id" min="1" max="10" value="0">
+      <input type="submit">
+  </form>
+
+  <table id="user-posts" style="margin-top: 40px; border-collapse: collapse"></table>
+
   <script src="bundle.js"></script>
 </body>
 </html>

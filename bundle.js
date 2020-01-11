@@ -1,19 +1,88 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
-var axios = require('axios'); //მაგალითები
+//amocana 1
+var userForm = document.querySelector("#user-search");
+
+userForm.onsubmit = function (event) {
+  return submitHandler(event);
+};
+
+function submitHandler(event) {
+  event.preventDefault();
+  var enteredId = event.target.querySelector("#user-id").value;
+  var userPosts = document.querySelector("#user-posts");
+  userPosts.innerHTML = "";
+  fetch("https://jsonplaceholder.typicode.com/posts?userId=".concat(enteredId)).then(function (response) {
+    return response.json();
+  }).then(function (json) {
+    return json.map(function (post) {
+      var title = document.createElement("td");
+      title.innerHTML = post.title;
+      var content = document.createElement("td");
+      content.innerHTML = post.body;
+      var button = document.createElement("button");
+      button.innerHTML = "Show comments";
+      var postId = document.createAttribute("data-post-id");
+      postId.value = post.id;
+      button.setAttributeNode(postId);
+
+      button.onclick = function (event) {
+        return showComments(event);
+      };
+
+      var commentsBtn = document.createElement("td");
+      commentsBtn.appendChild(button);
+      var row = document.createElement("tr");
+      row.appendChild(title);
+      row.appendChild(content);
+      row.appendChild(commentsBtn);
+      userPosts.appendChild(row);
+    });
+  });
+} //amocana 2
 
 
-fetch('https://jsonplaceholder.typicode.com/todos/1').then(function (response) {
-  return response.json();
-}).then(function (json) {
-  return console.log(json);
-});
-axios.get('https://jsonplaceholder.typicode.com/todos/1').then(function (response) {
-  console.log(response.data);
-}).catch(function (error) {
-  console.log(error);
-});
+var axios = require('axios');
+
+function showComments(event) {
+  var postId = event.target.getAttribute("data-post-id");
+  var postsTeble = event.target.closest("table");
+  var active = postsTeble.querySelector(".active");
+
+  if (active) {
+    active.classList.remove("active");
+
+    var _commentsTable = document.querySelector(".post-comments");
+
+    active.removeChild(_commentsTable);
+  }
+
+  var currentPost = event.target.closest("tr");
+  currentPost.classList.add("active");
+  var commentsTable = document.createElement("table");
+  commentsTable.classList.add("post-comments");
+  currentPost.appendChild(commentsTable);
+  var postComments = document.querySelector(".post-comments");
+  axios.get("https://jsonplaceholder.typicode.com/comments?postId=".concat(postId)).then(function (response) {
+    return response.data.map(function (item) {
+      var name = document.createElement("td");
+      var email = document.createElement("td");
+      var comment = document.createElement("td");
+      name.innerHTML = item.name;
+      email.innerHTML = item.email;
+      comment.innerHTML = item.body;
+      var row = document.createElement("tr");
+      row.appendChild(name);
+      row.appendChild(email);
+      row.appendChild(comment);
+      postComments.appendChild(row);
+    });
+  }).catch(function (error) {
+    console.log(error);
+    alert("Something went wrong");
+  });
+}
 
 },{"axios":2}],2:[function(require,module,exports){
 module.exports = require('./lib/axios');
